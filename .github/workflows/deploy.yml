@@ -1,0 +1,23 @@
+name: deploy
+on: [ workflow_dispatch, push ]
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: checkout code
+        uses: actions/checkout@v3
+      - name: install node.js
+        uses: actions/setup-node@v4
+      - name: install dependencies
+        run: npm ci
+      - name: run tests
+        run: npm test
+      - name: Run linters
+        uses: wearerequired/lint-action@v2
+        with:
+          eslint: true
+          prettier: true  
+      - name: build project
+        run: npm run build
+      - name: deploy
+        run: echo "Deploying ..."    
