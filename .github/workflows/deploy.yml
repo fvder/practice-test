@@ -13,9 +13,7 @@ jobs:
       - name: run tests
         run: npm test
       - name: Run linters
-        uses: wearerequired/lint-action@v2
-        with:
-          eslint: true 
+        run: npm run lint
       - name: build project
         run: npm run build
       - name: deploy
