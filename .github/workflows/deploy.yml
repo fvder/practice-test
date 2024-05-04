@@ -13,8 +13,10 @@ jobs:
       - name: run tests
         run: npm test
       - name: Run linters
-        run: npm lint
+        uses: wearerequired/lint-action@v2
+        with:
+          eslint: true 
       - name: build project
-        run: npm build
+        run: npm run build
       - name: deploy
         run: echo "Deploying ..."    
