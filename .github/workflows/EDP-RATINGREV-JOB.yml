@@ -31,4 +31,7 @@ jobs:
                 python -m pip install pypandoc
                 python -m pip install wheel
                 python -m pip install cryptography snowflake-connector-python
+                python -m pip install awscli
+            - name: install-databricks-cli
+              uses: microsoft/install-databricks-cli@v1.0.0
     
