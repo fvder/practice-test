@@ -37,4 +37,10 @@ jobs:
       - name: build project
         run: npm run build
       - name: deploy
-        run: echo "Deploying ..."    
+        run: echo "Deploying ..."
+  output:
+    needs: deploy
+    runs-on: ubuntu-latest
+    steps:
+      - name: output github context for event
+        run: echo "${{ toJSON(github.event) }}"    
