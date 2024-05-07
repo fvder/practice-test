@@ -12,7 +12,7 @@ on:
         required: true
 
 jobs:
-  aws-operations:
+  s3-upload-test-file:
     runs-on: ubuntu-latest  # Specify the type of runner that the job will run on
 
     # Define environment variables used across multiple steps
