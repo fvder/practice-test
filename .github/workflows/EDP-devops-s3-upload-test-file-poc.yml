@@ -41,6 +41,12 @@ jobs:
         echo "test" > $GITHUB_WORKSPACE/test.txt  # Create a simple test file in the repository workspace
         aws s3 cp $GITHUB_WORKSPACE/test.txt s3://${{ env.BUCKET_NAME }}/test22.txt --sse aws:kms --sse-kms-key-id alias/${{ env.KMS_KEY }}  # Upload file to S3 with encryption
 
+    - name: Upload test.txt as an artifact
+      uses: actions/upload-artifact@v3
+      with:
+        name: test-file
+        path: ${{ github.workspace }}/test.txt  # Specify the path to the test.txt file  
+
     - name: Wait to check
       run: |
         echo "Waiting 5 minutes to check that file is in S3 bucket"  # Wait to allow time for file upload verification
@@ -52,3 +58,6 @@ jobs:
         AWS_SECRET_ACCESS_KEY: ${{ secrets.TEST_AWS_SECRET_ACCESS_KEY }}
         AWS_DEFAULT_REGION: ${{ github.event.inputs.region_id }}
       run: aws s3 rm s3://${{ env.BUCKET_NAME }}/test22.txt  # Remove the uploaded test file from S3
+
+    - name: Remove test.txt from workspace
+      run: rm -f $GITHUB_WORKSPACE/test.txt
