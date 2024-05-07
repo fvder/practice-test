@@ -26,15 +26,15 @@ jobs:
 
     - name: List S3 Bucket
       env:
-        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}  # Set AWS credentials as environment variables for AWS CLI commands
-        AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        AWS_ACCESS_KEY_ID: ${{ secrets.TEST_AWS_ACCESS_KEY_ID }}  # Set AWS credentials as environment variables for AWS CLI commands
+        AWS_SECRET_ACCESS_KEY: ${{ secrets.TEST_AWS_SECRET_ACCESS_KEY }}
         AWS_DEFAULT_REGION: ${{ github.event.inputs.region_id }}
       run: aws s3 ls s3://${{ env.BUCKET_NAME }}/  # List contents of specified S3 bucket
 
     - name: Upload file to AWS S3
       env:
-        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-        AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        AWS_ACCESS_KEY_ID: ${{ secrets.TEST_AWS_ACCESS_KEY_ID }}
+        AWS_SECRET_ACCESS_KEY: ${{ secrets.TEST_AWS_SECRET_ACCESS_KEY }}
         AWS_DEFAULT_REGION: ${{ github.event.inputs.region_id }}
         KMS_KEY: ${{ secrets.KMS_KEY }}  # Use KMS key for server-side encryption
       run: |
@@ -48,7 +48,7 @@ jobs:
 
     - name: Delete AWS S3 file
       env:
-        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-        AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        AWS_ACCESS_KEY_ID: ${{ secrets.TEST_AWS_ACCESS_KEY_ID }}
+        AWS_SECRET_ACCESS_KEY: ${{ secrets.TEST_AWS_SECRET_ACCESS_KEY }}
         AWS_DEFAULT_REGION: ${{ github.event.inputs.region_id }}
       run: aws s3 rm s3://${{ env.BUCKET_NAME }}/test22.txt  # Remove the uploaded test file from S3
