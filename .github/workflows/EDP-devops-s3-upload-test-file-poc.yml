@@ -38,8 +38,8 @@ jobs:
         AWS_DEFAULT_REGION: ${{ github.event.inputs.region_id }}
         KMS_KEY: ${{ secrets.KMS_KEY }}  # Use KMS key for server-side encryption
       run: |
-        echo "test" > /tmp/test.txt  # Create a simple test file
-        aws s3 cp /tmp/test.txt s3://${{ env.BUCKET_NAME }}/test22.txt --sse aws:kms --sse-kms-key-id alias/${{ env.KMS_KEY }}  # Upload file to S3 with encryption
+        echo "test" > $GITHUB_WORKSPACE/test.txt  # Create a simple test file in the repository workspace
+        aws s3 cp $GITHUB_WORKSPACE/test.txt s3://${{ env.BUCKET_NAME }}/test22.txt --sse aws:kms --sse-kms-key-id alias/${{ env.KMS_KEY }}  # Upload file to S3 with encryption
 
     - name: Wait to check
       run: |
