@@ -1,0 +1,29 @@
+// node('agent-python') {
+//     stage('set credentials - AWS') {
+//         withCredentials([string(credentialsId: "${srv_account}_key", variable: 'KEY'),string(credentialsId: "${srv_account}_secret", variable: 'SECRET')]) {
+//             writeFile file: '/home/jenkins/.aws/credentials', text: """[default]
+//             aws_access_key_id=$KEY
+//             aws_secret_access_key=$SECRET
+//             """
+//         }
+//     }
+
+//     stage('Listing AWS S3') {
+//         sh "aws s3 ls s3://${bucket_name}/ --region ${region_id} --cli-connect-timeout 10"
+//     }
+
+//     stage('Uploading to AWS S3') {
+//         sh 'echo "test" > /tmp/test.txt'
+//         sh "aws s3 cp /tmp/test.txt s3://${bucket_name}/test22.txt --region ${region_id} --sse aws:kms --sse-kms-key-id alias/${kms_key} --cli-connect-timeout 10"
+//     }
+
+//     stage('Wait to check') {
+//         sh 'echo "Waiting 5 minutes to check that file is in S3 bucket"'
+//         sh "sleep 300" // seconds
+//     }
+
+//     stage('Delete AWS S3 file') {
+//         sh "aws s3 rm s3://${bucket_name}/test22.txt --region ${region_id}"
+//     }
+
+// }

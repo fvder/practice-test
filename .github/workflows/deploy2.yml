@@ -1,46 +1,46 @@
-name: deploy
-on: [ workflow_dispatch, push ]
-jobs:
-  test:
-    runs-on: ubuntu-latest
-    steps:
-      - name: checkout code
-        uses: actions/checkout@v3
-      - name: install node.js
-        uses: actions/setup-node@v4
-      - name: install dependencies
-        run: npm ci
-      - name: run tests
-        run: npm test
-  lint:
-    needs: test
-    runs-on: ubuntu-latest
-    steps:
-      - name: checkout code
-        uses: actions/checkout@v3
-      - name: install node.js
-        uses: actions/setup-node@v4
-      - name: install dependencies
-        run: npm ci
-      - name: Run linters
-        run: npm run lint
-  deploy:
-    needs: lint
-    runs-on: ubuntu-latest
-    steps:
-      - name: checkout code
-        uses: actions/checkout@v3
-      - name: install node.js
-        uses: actions/setup-node@v4
-      - name: install dependencies
-        run: npm ci
-      - name: build project
-        run: npm run build
-      - name: deploy
-        run: echo "Deploying ..."
-  output:
-    needs: deploy
-    runs-on: ubuntu-latest
-    steps:
-      - name: output github context for event
-        run: echo "${{ toJSON(github.event) }}"    
+# name: deploy
+# on: [ workflow_dispatch, push ]
+# jobs:
+#   test:
+#     runs-on: ubuntu-latest
+#     steps:
+#       - name: checkout code
+#         uses: actions/checkout@v3
+#       - name: install node.js
+#         uses: actions/setup-node@v4
+#       - name: install dependencies
+#         run: npm ci
+#       - name: run tests
+#         run: npm test
+#   lint:
+#     needs: test
+#     runs-on: ubuntu-latest
+#     steps:
+#       - name: checkout code
+#         uses: actions/checkout@v3
+#       - name: install node.js
+#         uses: actions/setup-node@v4
+#       - name: install dependencies
+#         run: npm ci
+#       - name: Run linters
+#         run: npm run lint
+#   deploy:
+#     needs: lint
+#     runs-on: ubuntu-latest
+#     steps:
+#       - name: checkout code
+#         uses: actions/checkout@v3
+#       - name: install node.js
+#         uses: actions/setup-node@v4
+#       - name: install dependencies
+#         run: npm ci
+#       - name: build project
+#         run: npm run build
+#       - name: deploy
+#         run: echo "Deploying ..."
+#   output:
+#     needs: deploy
+#     runs-on: ubuntu-latest
+#     steps:
+#       - name: output github context for event
+#         run: echo "${{ toJSON(github.event) }}"    
