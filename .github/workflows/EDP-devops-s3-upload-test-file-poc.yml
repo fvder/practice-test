@@ -61,3 +61,4 @@ jobs:
 
     - name: Remove test.txt from workspace
       run: rm -f $GITHUB_WORKSPACE/test.txt
+      
