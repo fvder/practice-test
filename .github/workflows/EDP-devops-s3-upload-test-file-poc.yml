@@ -29,7 +29,9 @@ jobs:
         AWS_ACCESS_KEY_ID: ${{ secrets.TEST_AWS_ACCESS_KEY_ID }}  # Set AWS credentials as environment variables for AWS CLI commands
         AWS_SECRET_ACCESS_KEY: ${{ secrets.TEST_AWS_SECRET_ACCESS_KEY }}
         AWS_DEFAULT_REGION: ${{ github.event.inputs.region_id }}
-      run: aws s3 ls s3://${{ env.BUCKET_NAME }}/  # List contents of specified S3 bucket
+      run: |
+        aws s3 ls
+        aws s3 ls s3://${{ env.BUCKET_NAME }}/  # List contents of specified S3 bucket
 
     - name: Upload file to AWS S3
       env:
