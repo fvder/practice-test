@@ -38,7 +38,8 @@ jobs:
         AWS_DEFAULT_REGION: ${{ github.event.inputs.region_id }}
         KMS_KEY: ${{ secrets.KMS_KEY }}  # Use KMS key for server-side encryption
       run: |
-        echo "test" > $GITHUB_WORKSPACE/test.txt  # Create a simple test file in the repository workspace
+        echo "hello" > $GITHUB_WORKSPACE/test.txt  # Create a simple test file in the repository workspace
+        cat test.txt
         aws s3 cp $GITHUB_WORKSPACE/test.txt s3://${{ env.BUCKET_NAME }}/test22.txt --sse aws:kms --sse-kms-key-id alias/${{ env.KMS_KEY }}  # Upload file to S3 with encryption
 
     - name: Upload test.txt as an artifact
@@ -61,4 +62,3 @@ jobs:
 
     - name: Remove test.txt from workspace
       run: rm -f $GITHUB_WORKSPACE/test.txt
-      
