@@ -1,0 +1,161 @@
+name: Generate kinesis_firehose.json
+
+on:
+  workflow_dispatch:
+    inputs:
+      deploy:
+        description: "Boolean to deploy resources"
+        required: true
+        default: true
+        type: boolean
+      stream_name:
+        description: "Name of the firehose stream"
+        required: true
+      s3_bucket_arn:
+        description: "ARN of the S3 bucket"
+        required: true
+      s3_prefix:
+        description: "S3 prefix"
+        required: true
+      buffer_size:
+        description: "Buffer size in MBs"
+        required: true
+        default: 5
+        type: number
+      buffer_interval:
+        description: "Buffer interval in seconds"
+        required: true
+        default: 300
+        type: number
+      role_arn:
+        description: "IAM role ARN"
+        required: true
+      kms_key_arn:
+        description: "KMS key ARN for S3 bucket encryption"
+        required: true
+        default: ""
+      compression_format:
+        description: "Compression format for S3"
+        required: true
+        default: "GZIP"
+      sse_kms_key_type:
+        description: "SSE KMS key type"
+        required: true
+        default: "AWS_OWNED_CMK"
+      error_output_prefix:
+        description: "Prefix for error output"
+        required: true
+      dynamic_partitioning:
+        description: "Boolean to enable or disable dynamic partitioning"
+        required: true
+        default: false
+        type: boolean
+      dynamic_partitioning_retry_duration:
+        description: "Retry duration for dynamic partitioning in seconds"
+        required: true
+        default: 300
+        type: number
+      enable_processing_configuration:
+        description: "Boolean to enable or disable the processing configuration"
+        required: true
+        default: false
+        type: boolean
+      lambda_arn:
+        description: "ARN of the Lambda function for processing"
+        required: true
+        default: ""
+      enable_cloudwatch_logging:
+        description: "Boolean to enable or disable CloudWatch logging"
+        required: true
+        default: false
+        type: boolean
+      cloudwatch_log_retention:
+        description: "Retention period for CloudWatch logs in days"
+        required: true
+        default: 7
+        type: number
+      cloudwatch_log_stream_name:
+        description: "Name of the CloudWatch log stream"
+        required: true
+        default: "S3Delivery"
+      tags:
+        description: "Tags to be applied to the resources"
+        required: true
+        default: "{}"
+
+jobs:
+  generate_json:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Generate kinesis_firehose.json
+        run: |
+          echo '{
+            "deploy": ${{
+              github.event.inputs.deploy
+            }},
+            "stream_name": "${{
+              github.event.inputs.stream_name
+            }}",
+            "s3_bucket_arn": "${{
+              github.event.inputs.s3_bucket_arn
+            }}",
+            "s3_prefix": "${{
+              github.event.inputs.s3_prefix
+            }}",
+            "buffer_size": ${{
+              github.event.inputs.buffer_size
+            }},
+            "buffer_interval": ${{
+              github.event.inputs.buffer_interval
+            }},
+            "role_arn": "${{
+              github.event.inputs.role_arn
+            }}",
+            "kms_key_arn": "${{
+              github.event.inputs.kms_key_arn
+            }}",
+            "compression_format": "${{
+              github.event.inputs.compression_format
+            }}",
+            "sse_kms_key_type": "${{
+              github.event.inputs.sse_kms_key_type
+            }}",
+            "error_output_prefix": "${{
+              github.event.inputs.error_output_prefix
+            }}",
+            "dynamic_partitioning": ${{
+              github.event.inputs.dynamic_partitioning
+            }},
+            "dynamic_partitioning_retry_duration": ${{
+              github.event.inputs.dynamic_partitioning_retry_duration
+            }},
+            "enable_processing_configuration": ${{
+              github.event.inputs.enable_processing_configuration
+            }},
+            "lambda_arn": "${{
+              github.event.inputs.lambda_arn
+            }}",
+            "enable_cloudwatch_logging": ${{
+              github.event.inputs.enable_cloudwatch_logging
+            }},
+            "cloudwatch_log_retention": ${{
+              github.event.inputs.cloudwatch_log_retention
+            }},
+            "cloudwatch_log_stream_name": "${{
+              github.event.inputs.cloudwatch_log_stream_name
+            }}",
+            "tags": ${{
+              github.event.inputs.tags
+            }}
+          }' > specified_folder/kinesis_firehose.json
+
+      - name: Commit kinesis_firehose.json
+        run: |
+          git config --global user.name 'github-actions[bot]'
+          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+          git add specified_folder/kinesis_firehose.json
+          git commit -m 'Add generated kinesis_firehose.json'
+          git push
