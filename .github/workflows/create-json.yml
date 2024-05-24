@@ -87,12 +87,12 @@ jobs:
             "sse_kms_key_type": "${{
               github.event.inputs.sse_kms_key_type
             }}"
-          }' > specified_folder/kinesis_firehose.json
+          }' > ./kinesis_firehose.json
 
       - name: Commit kinesis_firehose.json
         run: |
           git config --global user.name 'github-actions[bot]'
           git config --global user.email 'github-actions[bot]@users.noreply.github.com'
-          git add specified_folder/kinesis_firehose.json
+          git add ./kinesis_firehose.json
           git commit -m 'Add generated kinesis_firehose.json'
           git push
