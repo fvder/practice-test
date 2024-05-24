@@ -1,0 +1,12 @@
+{
+  "deploy": true,
+  "stream_name": "test",
+  "s3_bucket_arn": "xxx",
+  "s3_prefix": "hdhgd",
+  "buffer_size": 5,
+  "buffer_interval": 300,
+  "role_arn": "xxxx",
+  "kms_key_arn": "hdhdh",
+  "compression_format": "GZIP",
+  "sse_kms_key_type": "AWS_OWNED_CMK"
+}
