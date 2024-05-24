@@ -97,4 +97,4 @@ jobs:
             git config --global user.email 'joseph.duduyemi09@gmail.com'
             git add ./kinesis_firehose.json
             git commit -m 'Add generated kinesis_firehose.json'
-            git push https://fvder:${{ secrets.ACTIONS_PAT }}@github.com/fvder/practice-test HEAD:refs/heads/master
+            git push https://${{ secrets.ACTIONS_PAT }}@github.com/fvder/practice-test.git
