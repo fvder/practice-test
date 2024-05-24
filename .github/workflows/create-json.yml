@@ -11,12 +11,15 @@ on:
       stream_name:
         description: "Name of the firehose stream"
         required: true
+        default: ""
       s3_bucket_arn:
         description: "ARN of the S3 bucket"
         required: true
+        default: ""
       s3_prefix:
         description: "S3 prefix"
         required: true
+        default: ""
       buffer_size:
         description: "Buffer size in MBs"
         required: true
@@ -30,6 +33,7 @@ on:
       role_arn:
         description: "IAM role ARN"
         required: true
+        default: ""
       kms_key_arn:
         description: "KMS key ARN for S3 bucket encryption"
         required: true
@@ -45,6 +49,7 @@ on:
       error_output_prefix:
         description: "Prefix for error output"
         required: true
+        default: ""
       dynamic_partitioning:
         description: "Boolean to enable or disable dynamic partitioning"
         required: true
