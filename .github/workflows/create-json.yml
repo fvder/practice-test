@@ -90,11 +90,60 @@ jobs:
           }' > ./kinesis_firehose.json
 
       - name: Commit and Push kinesis_firehose.json
-        env:
-            ACTIONS_PAT: ${{ secrets.ACTIONS_PAT }}
-        run: |
-            git config --global user.name 'fvder'
-            git config --global user.email 'joseph.duduyemi09@gmail.com'
-            git add ./kinesis_firehose.json
-            git commit -m 'Add generated kinesis_firehose.json'
-            git push https://${{ secrets.ACTIONS_PAT }}@github.com/fvder/practice-test HEAD:refs/heads/master
+        uses: actions/github-script@v6
+        with:
+         script: |
+          const fs = require('fs');
+          const content = fs.readFileSync('kinesis_firehose.json', 'utf8');
+
+          const { data: refData } = await github.git.getRef({
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            ref: 'heads/master'
+          });
+
+          const shaLatestCommit = refData.object.sha;
+
+          const { data: commitData } = await github.repos.getCommit({
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            ref: shaLatestCommit
+          });
+
+          const shaBaseTree = commitData.commit.tree.sha;
+
+          const { data: blobData } = await github.git.createBlob({
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            content: content,
+            encoding: 'utf-8'
+          });
+
+          const { data: newTree } = await github.git.createTree({
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            base_tree: shaBaseTree,
+            tree: [
+              {
+                path: 'kinesis_firehose.json',
+                mode: '100644',
+                type: 'blob',
+                sha: blobData.sha
+              }
+            ]
+          });
+
+          const { data: newCommit } = await github.git.createCommit({
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            message: 'Add generated kinesis_firehose.json',
+            tree: newTree.sha,
+            parents: [shaLatestCommit]
+          });
+
+          await github.git.updateRef({
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            ref: 'heads/master',
+            sha: newCommit.sha
+          });
