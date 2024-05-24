@@ -89,10 +89,10 @@ jobs:
             }}"
           }' > ./kinesis_firehose.json
 
-          - name: Commit and Push kinesis_firehose.json
-          env:
+      - name: Commit and Push kinesis_firehose.json
+        env:
             ACTIONS_PAT: ${{ secrets.ACTIONS_PAT }}
-          run: |
+        run: |
             git config --global user.name 'fvder'
             git config --global user.email 'joseph.duduyemi09@gmail.com'
             git add ./kinesis_firehose.json
