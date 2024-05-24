@@ -46,47 +46,6 @@ on:
         description: "SSE KMS key type"
         required: true
         default: "AWS_OWNED_CMK"
-      error_output_prefix:
-        description: "Prefix for error output"
-        required: true
-        default: ""
-      dynamic_partitioning:
-        description: "Boolean to enable or disable dynamic partitioning"
-        required: true
-        default: false
-        type: boolean
-      dynamic_partitioning_retry_duration:
-        description: "Retry duration for dynamic partitioning in seconds"
-        required: true
-        default: 300
-        type: number
-      enable_processing_configuration:
-        description: "Boolean to enable or disable the processing configuration"
-        required: true
-        default: false
-        type: boolean
-      lambda_arn:
-        description: "ARN of the Lambda function for processing"
-        required: true
-        default: ""
-      enable_cloudwatch_logging:
-        description: "Boolean to enable or disable CloudWatch logging"
-        required: true
-        default: false
-        type: boolean
-      cloudwatch_log_retention:
-        description: "Retention period for CloudWatch logs in days"
-        required: true
-        default: 7
-        type: number
-      cloudwatch_log_stream_name:
-        description: "Name of the CloudWatch log stream"
-        required: true
-        default: "S3Delivery"
-      tags:
-        description: "Tags to be applied to the resources"
-        required: true
-        default: "{}"
 
 jobs:
   generate_json:
@@ -127,34 +86,7 @@ jobs:
             }}",
             "sse_kms_key_type": "${{
               github.event.inputs.sse_kms_key_type
-            }}",
-            "error_output_prefix": "${{
-              github.event.inputs.error_output_prefix
-            }}",
-            "dynamic_partitioning": ${{
-              github.event.inputs.dynamic_partitioning
-            }},
-            "dynamic_partitioning_retry_duration": ${{
-              github.event.inputs.dynamic_partitioning_retry_duration
-            }},
-            "enable_processing_configuration": ${{
-              github.event.inputs.enable_processing_configuration
-            }},
-            "lambda_arn": "${{
-              github.event.inputs.lambda_arn
-            }}",
-            "enable_cloudwatch_logging": ${{
-              github.event.inputs.enable_cloudwatch_logging
-            }},
-            "cloudwatch_log_retention": ${{
-              github.event.inputs.cloudwatch_log_retention
-            }},
-            "cloudwatch_log_stream_name": "${{
-              github.event.inputs.cloudwatch_log_stream_name
-            }}",
-            "tags": ${{
-              github.event.inputs.tags
-            }}
+            }}"
           }' > specified_folder/kinesis_firehose.json
 
       - name: Commit kinesis_firehose.json
