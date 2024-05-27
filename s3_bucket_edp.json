@@ -1,0 +1,5 @@
+{
+        "bucket_name": "test",
+        "acl": "acl",
+        "versioning": true
+      }
