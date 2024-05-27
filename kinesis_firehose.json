@@ -7,6 +7,5 @@
   "buffer_interval": 300,
   "role_arn": "xxxx",
   "kms_key_arn": "hdhdh",
-  "compression_format": "GZIP",
   "sse_kms_key_type": "AWS_OWNED_CMK"
 }
