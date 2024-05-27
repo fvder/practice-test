@@ -1,0 +1,127 @@
+name: Generate Resource Configuration
+
+on:
+  workflow_dispatch:
+    inputs:
+      resource_type:
+        description: "Type of resource to configure (kinesis_firehose, s3_bucket, sqs)"
+        required: true
+        default: "kinesis_firehose"
+      json_file_name:
+        description: "Name of the JSON file to be created (without extension)"
+        required: true
+        default: "resource_config"
+      # Kinesis Firehose inputs
+      kf_stream_name:
+        description: "Name of the firehose stream"
+        required: false
+        default: ""
+      kf_s3_bucket_arn:
+        description: "ARN of the S3 bucket for Firehose"
+        required: false
+        default: ""
+      kf_s3_prefix:
+        description: "S3 prefix for Firehose"
+        required: false
+        default: ""
+      kf_buffer_size:
+        description: "Buffer size in MBs for Firehose"
+        required: false
+        default: 5
+        type: number
+      kf_buffer_interval:
+        description: "Buffer interval in seconds for Firehose"
+        required: false
+        default: 300
+        type: number
+      kf_role_arn:
+        description: "IAM role ARN for Firehose"
+        required: false
+        default: ""
+      # S3 Bucket inputs
+      s3_bucket_name:
+        description: "Name of the S3 bucket"
+        required: false
+        default: ""
+      s3_bucket_acl:
+        description: "ACL for the S3 bucket"
+        required: false
+        default: "private"
+      s3_bucket_versioning:
+        description: "Boolean to enable versioning for the S3 bucket"
+        required: false
+        default: false
+        type: boolean
+      # SQS inputs
+      sqs_queue_name:
+        description: "Name of the SQS queue"
+        required: false
+        default: ""
+      sqs_queue_delay_seconds:
+        description: "Delay seconds for the SQS queue"
+        required: false
+        default: 0
+        type: number
+      sqs_queue_maximum_message_size:
+        description: "Maximum message size for the SQS queue"
+        required: false
+        default: 262144
+        type: number
+
+jobs:
+  generate_configuration:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Generate configuration file
+        run: |
+          case "${{ github.event.inputs.resource_type }}" in
+            "kinesis_firehose")
+              cat <<EOF > ./${{ github.event.inputs.json_file_name }}.json
+              {
+                "stream_name": "${{ github.event.inputs.kf_stream_name }}",
+                "s3_bucket_arn": "${{ github.event.inputs.kf_s3_bucket_arn }}",
+                "s3_prefix": "${{ github.event.inputs.kf_s3_prefix }}",
+                "buffer_size": ${{ github.event.inputs.kf_buffer_size }},
+                "buffer_interval": ${{ github.event.inputs.kf_buffer_interval }},
+                "role_arn": "${{ github.event.inputs.kf_role_arn }}"
+              }
+              EOF
+              ;;
+            "s3_bucket")
+              cat <<EOF > ./${{ github.event.inputs.json_file_name }}.json
+              {
+                "bucket_name": "${{ github.event.inputs.s3_bucket_name }}",
+                "acl": "${{ github.event.inputs.s3_bucket_acl }}",
+                "versioning": ${{ github.event.inputs.s3_bucket_versioning }}
+              }
+              EOF
+              ;;
+            "sqs")
+              cat <<EOF > ./${{ github.event.inputs.json_file_name }}.json
+              {
+                "queue_name": "${{ github.event.inputs.sqs_queue_name }}",
+                "delay_seconds": ${{ github.event.inputs.sqs_queue_delay_seconds }},
+                "maximum_message_size": ${{ github.event.inputs.sqs_queue_maximum_message_size }}
+              }
+              EOF
+              ;;
+            *)
+              echo "Invalid resource type: ${{ github.event.inputs.resource_type }}"
+              exit 1
+              ;;
+          esac
+
+      - name: Commit and Push configuration file
+        env:
+          ACTIONS_PAT: ${{ secrets.ACTIONS_PAT }}
+        run: |
+          git config --global user.name 'fvder'
+          git config --global user.email 'joseph.duduyemi09@gmail.com'
+          git checkout master
+          git pull https://fvder:${{ secrets.ACTIONS_PAT }}@github.com/fvder/practice-test master
+          git add ./${{ github.event.inputs.json_file_name }}.json
+          git commit -m "Add generated ${{ github.event.inputs.resource_type }} configuration - $(date)"
+          git push https://${{ secrets.ACTIONS_PAT }}@github.com/fvder/practice-test HEAD:refs/heads/master
