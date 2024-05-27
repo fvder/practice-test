@@ -7,66 +7,23 @@ on:
         description: "Type of resource to configure (kinesis_firehose, s3_bucket, sqs)"
         required: true
         default: "kinesis_firehose"
+        # Users will enter a comma-separated list of variables they want to set
       json_file_name:
         description: "Name of the JSON file to be created (without extension)"
         required: true
         default: "resource_config"
-      # Kinesis Firehose inputs
-      kf_stream_name:
-        description: "Name of the firehose stream"
+      kinesis_firehose_inputs:
+        description: "Comma-separated values for kinesis_firehose (stream_name,s3_bucket_arn,s3_prefix,buffer_size,buffer_interval,role_arn)"
         required: false
         default: ""
-      kf_s3_bucket_arn:
-        description: "ARN of the S3 bucket for Firehose"
+      s3_bucket_inputs:
+        description: "Comma-separated values for s3_bucket (bucket_name,acl,versioning)"
         required: false
         default: ""
-      kf_s3_prefix:
-        description: "S3 prefix for Firehose"
+      sqs_inputs:
+        description: "Comma-separated values for sqs (queue_name,delay_seconds,maximum_message_size)"
         required: false
         default: ""
-      kf_buffer_size:
-        description: "Buffer size in MBs for Firehose"
-        required: false
-        default: 5
-        type: number
-      kf_buffer_interval:
-        description: "Buffer interval in seconds for Firehose"
-        required: false
-        default: 300
-        type: number
-      kf_role_arn:
-        description: "IAM role ARN for Firehose"
-        required: false
-        default: ""
-      # S3 Bucket inputs
-      s3_bucket_name:
-        description: "Name of the S3 bucket"
-        required: false
-        default: ""
-      s3_bucket_acl:
-        description: "ACL for the S3 bucket"
-        required: false
-        default: "private"
-      s3_bucket_versioning:
-        description: "Boolean to enable versioning for the S3 bucket"
-        required: false
-        default: false
-        type: boolean
-      # SQS inputs
-      sqs_queue_name:
-        description: "Name of the SQS queue"
-        required: false
-        default: ""
-      sqs_queue_delay_seconds:
-        description: "Delay seconds for the SQS queue"
-        required: false
-        default: 0
-        type: number
-      sqs_queue_maximum_message_size:
-        description: "Maximum message size for the SQS queue"
-        required: false
-        default: 262144
-        type: number
 
 jobs:
   generate_configuration:
@@ -77,42 +34,63 @@ jobs:
 
       - name: Generate configuration file
         run: |
-          case "${{ github.event.inputs.resource_type }}" in
+          RESOURCE_TYPE="${{ github.event.inputs.resource_type }}"
+          JSON_FILE_NAME="${{ github.event.inputs.json_file_name }}"
+
+          # Function to parse comma-separated values into JSON format
+          parse_csv_to_json() {
+            IFS=',' read -r -a values <<< "$1"
+            case "$RESOURCE_TYPE" in
+              "kinesis_firehose")
+                echo "{
+                  \"stream_name\": \"${values[0]}\",
+                  \"s3_bucket_arn\": \"${values[1]}\",
+                  \"s3_prefix\": \"${values[2]}\",
+                  \"buffer_size\": ${values[3]},
+                  \"buffer_interval\": ${values[4]},
+                  \"role_arn\": \"${values[5]}\"
+                }"
+                ;;
+              "s3_bucket")
+                echo "{
+                  \"bucket_name\": \"${values[0]}\",
+                  \"acl\": \"${values[1]}\",
+                  \"versioning\": ${values[2]}
+                }"
+                ;;
+              "sqs")
+                echo "{
+                  \"queue_name\": \"${values[0]}\",
+                  \"delay_seconds\": ${values[1]},
+                  \"maximum_message_size\": ${values[2]}
+                }"
+                ;;
+              *)
+                echo "Invalid resource type"
+                exit 1
+                ;;
+            esac
+          }
+
+          # Generate the JSON configuration file based on the resource type
+          case "$RESOURCE_TYPE" in
             "kinesis_firehose")
-              cat <<EOF > ./${{ github.event.inputs.json_file_name }}.json
-              {
-                "stream_name": "${{ github.event.inputs.kf_stream_name }}",
-                "s3_bucket_arn": "${{ github.event.inputs.kf_s3_bucket_arn }}",
-                "s3_prefix": "${{ github.event.inputs.kf_s3_prefix }}",
-                "buffer_size": ${{ github.event.inputs.kf_buffer_size }},
-                "buffer_interval": ${{ github.event.inputs.kf_buffer_interval }},
-                "role_arn": "${{ github.event.inputs.kf_role_arn }}"
-              }
-              EOF
+              CONFIG_JSON=$(parse_csv_to_json "${{ github.event.inputs.kinesis_firehose_inputs }}")
               ;;
             "s3_bucket")
-              cat <<EOF > ./${{ github.event.inputs.json_file_name }}.json
-              {
-                "bucket_name": "${{ github.event.inputs.s3_bucket_name }}",
-                "acl": "${{ github.event.inputs.s3_bucket_acl }}",
-                "versioning": ${{ github.event.inputs.s3_bucket_versioning }}
-              }
-              EOF
+              CONFIG_JSON=$(parse_csv_to_json "${{ github.event.inputs.s3_bucket_inputs }}")
               ;;
             "sqs")
-              cat <<EOF > ./${{ github.event.inputs.json_file_name }}.json
-              {
-                "queue_name": "${{ github.event.inputs.sqs_queue_name }}",
-                "delay_seconds": ${{ github.event.inputs.sqs_queue_delay_seconds }},
-                "maximum_message_size": ${{ github.event.inputs.sqs_queue_maximum_message_size }}
-              }
-              EOF
+              CONFIG_JSON=$(parse_csv_to_json "${{ github.event.inputs.sqs_inputs }}")
               ;;
             *)
-              echo "Invalid resource type: ${{ github.event.inputs.resource_type }}"
+              echo "Invalid resource type: $RESOURCE_TYPE"
               exit 1
               ;;
           esac
+
+          # Write the JSON to the file
+          echo "$CONFIG_JSON" > ./$JSON_FILE_NAME.json
 
       - name: Commit and Push configuration file
         env:
@@ -121,7 +99,7 @@ jobs:
           git config --global user.name 'fvder'
           git config --global user.email 'joseph.duduyemi09@gmail.com'
           git checkout master
-          git pull https://fvder:${{ secrets.ACTIONS_PAT }}@github.com/fvder/practice-test master
+          git pull https://${{ secrets.ACTIONS_PAT }}@github.com/fvder/practice-test master
           git add ./${{ github.event.inputs.json_file_name }}.json
           git commit -m "Add generated ${{ github.event.inputs.resource_type }} configuration - $(date)"
           git push https://${{ secrets.ACTIONS_PAT }}@github.com/fvder/practice-test HEAD:refs/heads/master
