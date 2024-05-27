@@ -1,0 +1,8 @@
+{
+        "stream_name": "test",
+        "s3_bucket_arn": " arn",
+        "s3_prefix": " s3_prefix",
+        "buffer_size":  buffer_size,
+        "buffer_interval":  buffer_interval,
+        "role_arn": " role_arn"
+      }
