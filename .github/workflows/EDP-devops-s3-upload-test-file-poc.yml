@@ -1,66 +1,66 @@
-name: EDP-devops-s3-upload-test-file-poc
+# name: EDP-devops-s3-upload-test-file-poc
 
-# Trigger the workflow manually from the GitHub UI with specific inputs
-on: 
-  workflow_dispatch:
-    inputs:
-      bucket_name:
-        description: 'S3 Bucket Name'  # Prompt for S3 Bucket Name when running the workflow
-        required: true
-      region_id:
-        description: 'AWS Region ID'  # Prompt for AWS Region ID when running the workflow
-        required: true
+# # Trigger the workflow manually from the GitHub UI with specific inputs
+# on: 
+#   workflow_dispatch:
+#     inputs:
+#       bucket_name:
+#         description: 'S3 Bucket Name'  # Prompt for S3 Bucket Name when running the workflow
+#         required: true
+#       region_id:
+#         description: 'AWS Region ID'  # Prompt for AWS Region ID when running the workflow
+#         required: true
 
-jobs:
-  s3-upload-test-file:
-    runs-on: ubuntu-latest  # Specify the type of runner that the job will run on
+# jobs:
+#   s3-upload-test-file:
+#     runs-on: ubuntu-latest  # Specify the type of runner that the job will run on
 
-    # Define environment variables used across multiple steps
-    env:
-      BUCKET_NAME: ${{ github.event.inputs.bucket_name }}
-      REGION_ID: ${{ github.event.inputs.region_id }}
+#     # Define environment variables used across multiple steps
+#     env:
+#       BUCKET_NAME: ${{ github.event.inputs.bucket_name }}
+#       REGION_ID: ${{ github.event.inputs.region_id }}
 
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v3  # Checks out the repository under $GITHUB_WORKSPACE, so the workflow can access it
+#     steps:
+#     - name: Checkout code
+#       uses: actions/checkout@v3  # Checks out the repository under $GITHUB_WORKSPACE, so the workflow can access it
 
-    - name: List S3 Bucket
-      env:
-        AWS_ACCESS_KEY_ID: ${{ secrets.TEST_AWS_ACCESS_KEY_ID }}  # Set AWS credentials as environment variables for AWS CLI commands
-        AWS_SECRET_ACCESS_KEY: ${{ secrets.TEST_AWS_SECRET_ACCESS_KEY }}
-        AWS_DEFAULT_REGION: ${{ github.event.inputs.region_id }}
-      run: |
-        aws s3 ls
-        aws s3 ls s3://${{ env.BUCKET_NAME }}/  # List contents of specified S3 bucket
+#     - name: List S3 Bucket
+#       env:
+#         AWS_ACCESS_KEY_ID: ${{ secrets.TEST_AWS_ACCESS_KEY_ID }}  # Set AWS credentials as environment variables for AWS CLI commands
+#         AWS_SECRET_ACCESS_KEY: ${{ secrets.TEST_AWS_SECRET_ACCESS_KEY }}
+#         AWS_DEFAULT_REGION: ${{ github.event.inputs.region_id }}
+#       run: |
+#         aws s3 ls
+#         aws s3 ls s3://${{ env.BUCKET_NAME }}/  # List contents of specified S3 bucket
 
-    - name: Upload file to AWS S3
-      env:
-        AWS_ACCESS_KEY_ID: ${{ secrets.TEST_AWS_ACCESS_KEY_ID }}
-        AWS_SECRET_ACCESS_KEY: ${{ secrets.TEST_AWS_SECRET_ACCESS_KEY }}
-        AWS_DEFAULT_REGION: ${{ github.event.inputs.region_id }}
-        KMS_KEY: ${{ secrets.KMS_KEY }}  # Use KMS key for server-side encryption
-      run: |
-        echo "hello" > $GITHUB_WORKSPACE/test.txt  # Create a simple test file in the repository workspace
-        cat $GITHUB_WORKSPACE/test.txt
-        aws s3 cp $GITHUB_WORKSPACE/test.txt s3://${{ env.BUCKET_NAME }}/test22.txt --sse aws:kms --sse-kms-key-id alias/${{ env.KMS_KEY }}  # Upload file to S3 with encryption
+#     - name: Upload file to AWS S3
+#       env:
+#         AWS_ACCESS_KEY_ID: ${{ secrets.TEST_AWS_ACCESS_KEY_ID }}
+#         AWS_SECRET_ACCESS_KEY: ${{ secrets.TEST_AWS_SECRET_ACCESS_KEY }}
+#         AWS_DEFAULT_REGION: ${{ github.event.inputs.region_id }}
+#         KMS_KEY: ${{ secrets.KMS_KEY }}  # Use KMS key for server-side encryption
+#       run: |
+#         echo "hello" > $GITHUB_WORKSPACE/test.txt  # Create a simple test file in the repository workspace
+#         cat $GITHUB_WORKSPACE/test.txt
+#         aws s3 cp $GITHUB_WORKSPACE/test.txt s3://${{ env.BUCKET_NAME }}/test22.txt --sse aws:kms --sse-kms-key-id alias/${{ env.KMS_KEY }}  # Upload file to S3 with encryption
 
-    # - name: Upload test.txt as an artifact
-    #   uses: actions/upload-artifact@v3
-    #   with:
-    #     name: test-file
-    #     path: ${{ github.workspace }}/test.txt  # Specify the path to the test.txt file  
+#     # - name: Upload test.txt as an artifact
+#     #   uses: actions/upload-artifact@v3
+#     #   with:
+#     #     name: test-file
+#     #     path: ${{ github.workspace }}/test.txt  # Specify the path to the test.txt file  
 
-    # - name: Wait to check
-    #   run: |
-    #     echo "Waiting 5 minutes to check that file is in S3 bucket"  # Wait to allow time for file upload verification
-    #     sleep 300  # Delay for 5 minutes
+#     # - name: Wait to check
+#     #   run: |
+#     #     echo "Waiting 5 minutes to check that file is in S3 bucket"  # Wait to allow time for file upload verification
+#     #     sleep 300  # Delay for 5 minutes
 
-    - name: Delete AWS S3 file
-      env:
-        AWS_ACCESS_KEY_ID: ${{ secrets.TEST_AWS_ACCESS_KEY_ID }}
-        AWS_SECRET_ACCESS_KEY: ${{ secrets.TEST_AWS_SECRET_ACCESS_KEY }}
-        AWS_DEFAULT_REGION: ${{ github.event.inputs.region_id }}
-      run: aws s3 rm s3://${{ env.BUCKET_NAME }}/test22.txt  # Remove the uploaded test file from S3
+#     - name: Delete AWS S3 file
+#       env:
+#         AWS_ACCESS_KEY_ID: ${{ secrets.TEST_AWS_ACCESS_KEY_ID }}
+#         AWS_SECRET_ACCESS_KEY: ${{ secrets.TEST_AWS_SECRET_ACCESS_KEY }}
+#         AWS_DEFAULT_REGION: ${{ github.event.inputs.region_id }}
+#       run: aws s3 rm s3://${{ env.BUCKET_NAME }}/test22.txt  # Remove the uploaded test file from S3
 
-    # - name: Remove test.txt from workspace
-    #   run: rm -f $GITHUB_WORKSPACE/test.txt
+#     # - name: Remove test.txt from workspace
+#     #   run: rm -f $GITHUB_WORKSPACE/test.txt
