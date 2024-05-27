@@ -86,14 +86,14 @@ jobs:
             }}"
           }' > ./kinesis_firehose.json
 
-          - name: Commit and Push kinesis_firehose.json
-          env:
-            ACTIONS_PAT: ${{ secrets.ACTIONS_PAT }}
-          run: |
-            git config --global user.name 'fvder'
-            git config --global user.email 'joseph.duduyemi09@gmail.com'
-            git checkout master
-            git pull https://${{ secrets.ACTIONS_PAT }}@github.com/fvder/practice-test.git master
-            git add ./kinesis_firehose.json
-            git commit -m "${{ github.event.inputs.commit_message }} - $(date)"
-            git push https://${{ secrets.ACTIONS_PAT }}@github.com/fvder/practice-test.git
+      - name: Commit and Push kinesis_firehose.json
+        env:
+          ACTIONS_PAT: ${{ secrets.ACTIONS_PAT }}
+        run: |
+          git config --global user.name 'fvder'
+          git config --global user.email 'joseph.duduyemi09@gmail.com'
+          git checkout master
+          git pull https://${{ secrets.ACTIONS_PAT }}@github.com/fvder/practice-test.git master
+          git add ./kinesis_firehose.json
+          git commit -m "${{ github.event.inputs.commit_message }} - $(date)"
+          git push https://${{ secrets.ACTIONS_PAT }}@github.com/fvder/practice-test.git
