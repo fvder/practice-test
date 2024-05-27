@@ -3,6 +3,10 @@ name: Generate kinesis_firehose.json
 on:
   workflow_dispatch:
     inputs:
+      commit_message:
+        description: "Commit message"
+        required: true
+        default: "Add generated kinesis_firehose.json"
       deploy:
         description: "Boolean to deploy resources"
         required: true
@@ -38,10 +42,6 @@ on:
         description: "KMS key ARN for S3 bucket encryption"
         required: true
         default: ""
-      compression_format:
-        description: "Compression format for S3"
-        required: true
-        default: "GZIP"
       sse_kms_key_type:
         description: "SSE KMS key type"
         required: true
@@ -81,20 +81,19 @@ jobs:
             "kms_key_arn": "${{
               github.event.inputs.kms_key_arn
             }}",
-            "compression_format": "${{
-              github.event.inputs.compression_format
-            }}",
             "sse_kms_key_type": "${{
               github.event.inputs.sse_kms_key_type
             }}"
           }' > ./kinesis_firehose.json
 
-      - name: Commit and Push kinesis_firehose.json
-        env:
+          - name: Commit and Push kinesis_firehose.json
+          env:
             ACTIONS_PAT: ${{ secrets.ACTIONS_PAT }}
-        run: |
+          run: |
             git config --global user.name 'fvder'
             git config --global user.email 'joseph.duduyemi09@gmail.com'
+            git checkout master
+            git pull https://${{ secrets.ACTIONS_PAT }}@github.com/fvder/practice-test.git master
             git add ./kinesis_firehose.json
-            git commit -m 'Add generated kinesis_firehose.json'
+            git commit -m "${{ github.event.inputs.commit_message }} - $(date)"
             git push https://${{ secrets.ACTIONS_PAT }}@github.com/fvder/practice-test.git
